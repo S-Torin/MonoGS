@@ -1,0 +1,52 @@
+inherit_from: "configs/rgbd/livo/base_config.yaml"
+
+Dataset:
+  # dataset_path: "datasets/livo/SYSU_01/"
+  dataset_path: "datasets/livo/HKU_Campus/"
+  # HKU_Campus, CBD_Building_02
+  Calibration:
+    fx: 588.1437146074966
+    fy: 588.107927226535
+    cx: 296.0593691377726
+    cy: 254.5432154814161
+    k1: 0.
+    k2: 0.
+    p1: 0.
+    p2: 0.
+    k3: 0.
+    width: 640
+    height: 512
+    depth_scale: 256
+    distorted: False
+
+  # Retail_Street, CBD_Building_01
+  # Calibration:
+  #   fx: 646.78472
+  #   fy: 646.65775
+  #   cx: 313.456795
+  #   cy: 261.399612
+  #   k1: 0.
+  #   k2: 0.
+  #   p1: 0.
+  #   p2: 0.
+  #   k3: 0.
+  #   width: 640
+  #   height: 512
+  #   depth_scale: 256
+  #   distorted: False
+
+  # SYSU_01, HIT_Graffiti_Wall_01
+  # Calibration:
+  #   fx: 655.9475856379
+  #   fy: 655.68244293057
+  #   cx: 328.2619209286965
+  #   cy: 252.068161420175
+  #   k1: 0.
+  #   k2: 0.
+  #   p1: 0.
+  #   p2: 0.
+  #   k3: 0.
+  #   width: 640
+  #   height: 512
+  #   depth_scale: 256
+  #   distorted: False
