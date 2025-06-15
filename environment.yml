@@ -5,18 +5,21 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  # - cudatoolkit=12.1
   - plyfile=0.8.1
   - python=3.10
   - pip=22.3.1
-  - pytorch=2.1.0
-  - torchaudio=2.1.0
-  - torchvision=0.16.0
+  - pytorch=2.0.0
+  - pytorch-cuda=11.8
+  - torchaudio=2.0.0
+  - torchmetrics=1.6.1
+  - torchvision=0.15.0
   - tqdm
   - pip:
     - submodules/simple-knn
     - submodules/diff-gaussian-rasterization
     - opencv-python==4.8.1.78
+    - numpy==1.25.0
+    - matplotlib==3.5.3
     - munch
     - trimesh
     - evo==1.11.0

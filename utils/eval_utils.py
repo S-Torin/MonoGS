@@ -61,7 +61,7 @@ def evaluate_evo(poses_gt, poses_est, result_dir, label, monocular=False):
         max_map=ape_stats["max"],
     )
     ax.legend()
-    plt.savefig(os.path.join(result_dir, "evo_2dplot_{}.png".format(str(label))), dpi=90)
+    plt.savefig(os.path.join(result_dir, "traj_{}.png".format(str(label))), dpi=90)
 
     return ape_stat
 
@@ -101,7 +101,7 @@ def eval_ate(frames, kf_ids, save_dir, final=False, monocular=False):
         poses_gt=all_trj_gt_np,
         poses_est=all_trj_est_np,
         result_dir=result_dir,
-        label=f"all_frames",
+        label=f"allframes",
         monocular=monocular,
     )
 
@@ -114,9 +114,9 @@ def eval_ate(frames, kf_ids, save_dir, final=False, monocular=False):
     )
 
     ate_results = {
-        "all_frames_ate": float(ate_all),
+        "allframes_ate": float(ate_all),
         "keyframes_ate": float(ate_kf),
-        "all_frames_count": len(all_trj_est_np),
+        "allframes_count": len(all_trj_est_np),
         "keyframes_count": len(kf_trj_est_np)
     }
 

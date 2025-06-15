@@ -1,18 +1,18 @@
-inherit_from: "configs/rgbd/tum/base_config.yaml"
+inherit_from: "configs/rgbd/livo/base_config.yaml"
 
 Dataset:
-  dataset_path: "datasets/tum/rgbd_dataset_freiburg3_long_office_household"
+  dataset_path: "datasets/livo/SEU01/"
   Calibration:
-    fx: 535.4
-    fy: 539.2
-    cx: 320.1
-    cy: 247.6
-    k1: 0.0
-    k2: 0.0
-    p1: 0.0
-    p2: 0.0
-    k3: 0.0
-    distorted: False
+    # fx: 535.4
+    # fy: 539.2
+    # cx: 320.1
+    # cy: 247.6
+    k1: 0.
+    k2: 0.
+    p1: 0.
+    p2: 0.
+    k3: 0.
     width: 640
-    height: 480
-    depth_scale: 5000.0
+    height: 512
+    depth_scale: 256
+    distorted: False
