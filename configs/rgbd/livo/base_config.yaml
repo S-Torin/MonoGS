@@ -4,7 +4,6 @@ Results:
   save_dir: "results"
   save_trj: True
   use_gui: True
-  eval_rendering: True
   use_wandb: False
 
 Dataset:
@@ -48,8 +47,8 @@ Training:
   lr:
     cam_rot_delta: 0.003
     cam_trans_delta: 0.001
-
-
+  post_training: True
+  post_training_iters: 30000
 
 ## 3DGS default parameters
 opt_params:

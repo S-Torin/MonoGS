@@ -5,7 +5,6 @@ Results:
   save_trj: False
   save_trj_kf_intv: 5
   use_gui: True
-  eval_rendering: False
   use_wandb: False
 
 Dataset:
@@ -50,6 +49,8 @@ Training:
     cam_rot_delta: 0.003
     cam_trans_delta: 0.001
 
+  post_training: False
+  post_training_iters: 30000
 
 
 ## 3DGS default parameters

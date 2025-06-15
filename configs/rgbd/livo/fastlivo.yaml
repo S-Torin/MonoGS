@@ -1,9 +1,9 @@
 inherit_from: "configs/rgbd/livo/base_config.yaml"
 
 Dataset:
-  # dataset_path: "datasets/livo/hku1/"
+  dataset_path: "datasets/livo/hku1/"
   # dataset_path: "datasets/livo/Visual_Challenge/"
-  dataset_path: "datasets/livo/LiDAR_Degenerate/"
+  # dataset_path: "datasets/livo/LiDAR_Degenerate/"
   Calibration:
     fx: 431.71205
     fy: 431.70855

@@ -64,6 +64,8 @@ class BackEnd(mp.Process):
             else False
         )
 
+        self.post_training_iters = self.config["Training"]["post_training_iters"]
+
     def add_next_kf(self, frame_idx, viewpoint, init=False, scale=2.0, depth_map=None):
         self.gaussians.extend_from_pcd_seq(
             viewpoint, kf_id=frame_idx, init=init, scale=scale, depthmap=depth_map
@@ -320,7 +322,7 @@ class BackEnd(mp.Process):
     def color_refinement(self):
         Log("Starting color refinement")
 
-        iteration_total = 26000
+        iteration_total = self.post_training_iters
         for iteration in tqdm(range(1, iteration_total + 1)):
             viewpoint_idx_stack = list(self.viewpoints.keys())
             viewpoint_cam_idx = viewpoint_idx_stack.pop(

@@ -46,7 +46,6 @@ class FrontEnd(mp.Process):
     def set_hyperparams(self):
         self.save_dir = self.config["Results"]["save_dir"]
         self.save_results = self.config["Results"]["save_results"]
-        self.save_trj = self.config["Results"]["save_trj"]
 
         self.tracking_itr_num = self.config["Training"]["tracking_itr_num"]
         self.kf_interval = self.config["Training"]["kf_interval"]
@@ -365,18 +364,6 @@ class FrontEnd(mp.Process):
             if self.frontend_queue.empty():
                 tic.record()
                 if cur_frame_idx >= len(self.dataset):
-                    if self.save_results:
-                        eval_ate(
-                            self.cameras,
-                            self.kf_indices,
-                            self.save_dir,
-                            0,
-                            final=True,
-                            monocular=self.monocular,
-                        )
-                        save_gaussians(
-                            self.gaussians, self.save_dir, "final", final=False
-                        )
                     break
 
                 if self.requested_init:

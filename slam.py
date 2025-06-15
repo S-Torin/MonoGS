@@ -46,7 +46,7 @@ class SLAM:
         self.use_gui = self.config["Results"]["use_gui"]
         if self.live_mode:
             self.use_gui = True
-        self.eval_rendering = self.config["Results"]["eval_rendering"]
+        self.post_training = self.config["Training"]["post_training"]
 
         model_params.sh_degree = 3 if self.use_spherical_harmonics else 0
 
@@ -57,7 +57,7 @@ class SLAM:
         )
 
         self.gaussians.training_setup(opt_params)
-        bg_color = [0, 0, 0]
+        bg_color = [1, 1, 1]
         self.background = torch.tensor(bg_color, dtype=torch.float32, device="cuda")
 
         frontend_queue = mp.Queue()
@@ -118,14 +118,57 @@ class SLAM:
         Log("Total time", start.elapsed_time(end) * 0.001, tag="Eval")
         Log("Total FPS", N_frames / (start.elapsed_time(end) * 0.001), tag="Eval")
 
-        if self.eval_rendering:
-            self.gaussians = self.frontend.gaussians
-            kf_indices = self.frontend.kf_indices
+        self.gaussians = self.frontend.gaussians
+        kf_indices = self.frontend.kf_indices
+        ATE = eval_ate(
+            self.frontend.cameras,
+            self.frontend.kf_indices,
+            self.save_dir,
+            final=False,
+            monocular=self.monocular,
+        )
+
+        rendering_result = eval_rendering(
+            self.frontend.cameras,
+            self.gaussians,
+            self.dataset,
+            self.save_dir,
+            self.pipeline_params,
+            self.background,
+            kf_indices=kf_indices,
+            final=False,
+        )
+        columns = ["tag", "psnr", "ssim", "lpips", "RMSE ATE", "FPS"]
+        metrics_table = wandb.Table(columns=columns)
+        metrics_table.add_data(
+            "Before",
+            rendering_result["mean_psnr"],
+            rendering_result["mean_ssim"],
+            rendering_result["mean_lpips"],
+            ATE,
+            FPS,
+        )
+        save_gaussians(self.gaussians, self.save_dir, final=False)
+
+        while not frontend_queue.empty():
+            frontend_queue.get()
+
+        if self.post_training:
+            backend_queue.put(["color_refinement"])
+            while True:
+                if frontend_queue.empty():
+                    time.sleep(0.01)
+                    continue
+                data = frontend_queue.get()
+                if data[0] == "sync_backend" and frontend_queue.empty():
+                    gaussians = data[1]
+                    self.gaussians = gaussians
+                    break
+
             ATE = eval_ate(
                 self.frontend.cameras,
                 self.frontend.kf_indices,
                 self.save_dir,
-                0,
                 final=True,
                 monocular=self.monocular,
             )
@@ -138,42 +181,7 @@ class SLAM:
                 self.pipeline_params,
                 self.background,
                 kf_indices=kf_indices,
-                iteration="before_opt",
-            )
-            columns = ["tag", "psnr", "ssim", "lpips", "RMSE ATE", "FPS"]
-            metrics_table = wandb.Table(columns=columns)
-            metrics_table.add_data(
-                "Before",
-                rendering_result["mean_psnr"],
-                rendering_result["mean_ssim"],
-                rendering_result["mean_lpips"],
-                ATE,
-                FPS,
-            )
-
-            # re-used the frontend queue to retrive the gaussians from the backend.
-            while not frontend_queue.empty():
-                frontend_queue.get()
-            backend_queue.put(["color_refinement"])
-            while True:
-                if frontend_queue.empty():
-                    time.sleep(0.01)
-                    continue
-                data = frontend_queue.get()
-                if data[0] == "sync_backend" and frontend_queue.empty():
-                    gaussians = data[1]
-                    self.gaussians = gaussians
-                    break
-
-            rendering_result = eval_rendering(
-                self.frontend.cameras,
-                self.gaussians,
-                self.dataset,
-                self.save_dir,
-                self.pipeline_params,
-                self.background,
-                kf_indices=kf_indices,
-                iteration="after_opt",
+                final=True
             )
             metrics_table.add_data(
                 "After",
@@ -183,8 +191,10 @@ class SLAM:
                 ATE,
                 FPS,
             )
-            wandb.log({"Metrics": metrics_table})
-            save_gaussians(self.gaussians, self.save_dir, "final_after_opt", final=True)
+
+            save_gaussians(self.gaussians, self.save_dir, final=True)
+
+        wandb.log({"Metrics": metrics_table})
 
         backend_queue.put(["stop"])
         backend_process.join()
@@ -202,7 +212,6 @@ if __name__ == "__main__":
     # Set up command line argument parser
     parser = ArgumentParser(description="Training script parameters")
     parser.add_argument("--config", type=str)
-    parser.add_argument("--eval", action="store_true")
 
     args = parser.parse_args(sys.argv[1:])
 
@@ -213,18 +222,6 @@ if __name__ == "__main__":
 
     config = load_config(args.config)
     save_dir = None
-
-    if args.eval:
-        Log("Running MonoGS in Evaluation Mode")
-        Log("Following config will be overriden")
-        Log("\tsave_results=True")
-        config["Results"]["save_results"] = True
-        Log("\tuse_gui=False")
-        config["Results"]["use_gui"] = False
-        Log("\teval_rendering=True")
-        config["Results"]["eval_rendering"] = True
-        Log("\tuse_wandb=True")
-        config["Results"]["use_wandb"] = True
 
     if config["Results"]["save_results"]:
         mkdir_p(config["Results"]["save_dir"])

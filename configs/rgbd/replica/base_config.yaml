@@ -4,7 +4,6 @@ Results:
   save_trj: True
   save_trj_kf_intv: 20
   use_gui: True
-  eval_rendering: False
   use_wandb: False
 
 Dataset:
@@ -60,6 +59,8 @@ Training:
     cam_rot_delta: 0.003
     cam_trans_delta: 0.001
 
+  post_training: False
+  post_training_iters: 30000
 
 opt_params:
   iterations: 30000
@@ -86,7 +87,7 @@ model_params:
   resolution: -1
   white_background: False
   data_device: "cuda"
-  
+
 pipeline_params:
   convert_SHs_python: False
   compute_cov3D_python: False
