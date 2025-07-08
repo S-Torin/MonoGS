@@ -19,7 +19,6 @@ class BackEnd(mp.Process):
         super().__init__()
         self.config = config
         self.gaussians = None
-        self.pipeline_params = None
         self.opt_params = None
         self.background = None
         self.cameras_extent = None
@@ -98,8 +97,7 @@ class BackEnd(mp.Process):
     def initialize_map(self, cur_frame_idx, viewpoint):
         for mapping_iteration in range(self.init_itr_num):
             self.iteration_count += 1
-            render_pkg = render(viewpoint, self.gaussians,
-                                self.pipeline_params, self.background)
+            render_pkg = render(viewpoint, self.gaussians, self.background)
             (
                 image,
                 viewspace_point_tensor,
@@ -183,8 +181,7 @@ class BackEnd(mp.Process):
             for cam_idx in range(len(current_window)):
                 viewpoint = viewpoint_stack[cam_idx]
                 keyframes_opt.append(viewpoint)
-                render_pkg = render(viewpoint, self.gaussians,
-                                    self.pipeline_params, self.background)
+                render_pkg = render(viewpoint, self.gaussians, self.background)
                 (
                     image,
                     viewspace_point_tensor,
@@ -212,8 +209,7 @@ class BackEnd(mp.Process):
 
             for cam_idx in torch.randperm(len(random_viewpoint_stack))[:2]:
                 viewpoint = random_viewpoint_stack[cam_idx]
-                render_pkg = render(viewpoint, self.gaussians,
-                                    self.pipeline_params, self.background)
+                render_pkg = render(viewpoint, self.gaussians, self.background)
                 (
                     image,
                     viewspace_point_tensor,
@@ -344,8 +340,7 @@ class BackEnd(mp.Process):
                 random.randint(0,
                                len(viewpoint_idx_stack) - 1))
             viewpoint_cam = self.viewpoints[viewpoint_cam_idx]
-            render_pkg = render(viewpoint_cam, self.gaussians,
-                                self.pipeline_params, self.background)
+            render_pkg = render(viewpoint_cam, self.gaussians, self.background)
             image, visibility_filter, radii = (
                 render_pkg["render"],
                 render_pkg["visibility_filter"],

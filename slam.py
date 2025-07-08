@@ -43,14 +43,12 @@ class SLAM:
 
         self.live_mode = self.config["Dataset"]["type"] == "realsense"
         self.monocular = self.config["Dataset"]["sensor_type"] == "monocular"
-        self.use_spherical_harmonics = self.config["Training"][
-            "spherical_harmonics"]
         self.use_gui = self.config["Results"]["use_gui"]
         if self.live_mode:
             self.use_gui = True
         self.post_training = self.config["Training"]["post_training"]
 
-        model_params.sh_degree = 3 if self.use_spherical_harmonics else 0
+        model_params.sh_degree = self.config["model_params"]["sh_degree"]
 
         self.gaussians = GaussianModel(model_params.sh_degree,
                                        config=self.config)

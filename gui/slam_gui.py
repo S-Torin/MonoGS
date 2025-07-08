@@ -78,7 +78,7 @@ class SLAM_GUI:
         threading.Thread(target=self._update_thread).start()
 
     def init_widget(self):
-        self.window_w, self.window_h = 1600, 900
+        self.window_w, self.window_h = 2560, 1600
 
         self.window = gui.Application.instance.create_window(
             "MonoGS", self.window_w, self.window_h)
@@ -536,7 +536,6 @@ class SLAM_GUI:
             rendering_data = render(
                 current_cam,
                 self.gaussian_cur,
-                self.pipe,
                 self.background,
                 self.scaling_slider.double_value,
             )
@@ -545,7 +544,6 @@ class SLAM_GUI:
             rendering_data = render(
                 current_cam,
                 self.gaussian_cur,
-                self.pipe,
                 self.background,
                 self.scaling_slider.double_value,
             )
@@ -583,16 +581,19 @@ class SLAM_GUI:
             if self.gaussian_cur is None:
                 return
             glfw.poll_events()
+
             gl.glClearColor(0, 0, 0, 1.0)
             gl.glClear(gl.GL_COLOR_BUFFER_BIT
                        | gl.GL_DEPTH_BUFFER_BIT
                        | gl.GL_STENCIL_BUFFER_BIT)
 
             w = int(self.window.size.width * self.widget3d_width_ratio)
-            glfw.set_window_size(self.window_gl, w, self.window.size.height)
+            h = self.window.size.height
+
+            glfw.set_window_size(self.window_gl, w, h)
             self.g_camera.fovy = current_cam.FoVy
-            self.g_camera.update_resolution(self.window.size.height, w)
-            self.g_renderer.set_render_reso(w, self.window.size.height)
+            self.g_camera.update_resolution(h, w)
+            self.g_renderer.set_render_reso(w, h)
             frustum = create_frustum(
                 np.linalg.inv(
                     cv_gl @ self.widget3d.scene.camera.get_view_matrix()))
@@ -613,13 +614,11 @@ class SLAM_GUI:
 
             self.update_activated_renderer_state(self.gaussians_gl)
             self.g_renderer.sort_and_update(self.g_camera)
-            width, height = glfw.get_framebuffer_size(self.window_gl)
             self.g_renderer.draw()
-            bufferdata = gl.glReadPixels(0, 0, width, height, gl.GL_RGB,
+            bufferdata = gl.glReadPixels(0, 0, w, h, gl.GL_RGB,
                                          gl.GL_UNSIGNED_BYTE)
-            img = np.frombuffer(bufferdata, np.uint8,
-                                -1).reshape(height, width, 3)
-            cv2.flip(img, 0, img)
+            img = np.frombuffer(bufferdata, np.uint8, -1).reshape(h, w, 3)
+            img = cv2.flip(img, 0)
             render_img = o3d.geometry.Image(img)
             glfw.swap_buffers(self.window_gl)
         else:

@@ -44,7 +44,6 @@ Training:
   kf_cutoff: 0.3
   prune_mode: 'slam'
   single_thread: False
-  spherical_harmonics: False
   lr:
     cam_rot_delta: 0.003
     cam_trans_delta: 0.001
