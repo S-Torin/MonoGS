@@ -22,7 +22,7 @@ Training:
   init_gaussian_th: 0.005
   init_gaussian_extent: 30
   # Tracking and Mapping
-  use_gt_pose: False
+  use_gt_pose: True
   tracking_itr_num: 100
   mapping_itr_num: 150
   gaussian_update_every: 150
@@ -76,7 +76,3 @@ model_params:
   resolution: -1
   white_background: False
   data_device: "cuda"
-
-pipeline_params:
-  convert_SHs_python: False
-  compute_cov3D_python: False

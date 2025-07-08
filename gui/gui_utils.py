@@ -164,13 +164,11 @@ class ParamsGUI:
 
     def __init__(
         self,
-        pipe=None,
         background=None,
         gaussians=None,
         q_main2vis=None,
         q_vis2main=None,
     ):
-        self.pipe = pipe
         self.background = background
         self.gaussians = gaussians
         self.q_main2vis = q_main2vis

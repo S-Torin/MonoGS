@@ -20,7 +20,6 @@ class FrontEnd(mp.Process):
         super().__init__()
         self.config = config
         self.background = None
-        self.pipeline_params = None
         self.frontend_queue = None
         self.backend_queue = None
         self.q_main2vis = None

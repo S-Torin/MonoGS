@@ -34,11 +34,9 @@ class SLAM:
         self.save_dir = save_dir
         model_params = munchify(config["model_params"])
         opt_params = munchify(config["opt_params"])
-        pipeline_params = munchify(config["pipeline_params"])
-        self.model_params, self.opt_params, self.pipeline_params = (
+        self.model_params, self.opt_params = (
             model_params,
             opt_params,
-            pipeline_params,
         )
 
         self.live_mode = self.config["Dataset"]["type"] == "realsense"
@@ -80,7 +78,6 @@ class SLAM:
 
         self.frontend.dataset = self.dataset
         self.frontend.background = self.background
-        self.frontend.pipeline_params = self.pipeline_params
         self.frontend.frontend_queue = frontend_queue
         self.frontend.backend_queue = backend_queue
         self.frontend.q_main2vis = q_main2vis
@@ -90,7 +87,6 @@ class SLAM:
         self.backend.gaussians = self.gaussians
         self.backend.background = self.background
         self.backend.cameras_extent = 6.0
-        self.backend.pipeline_params = self.pipeline_params
         self.backend.opt_params = self.opt_params
         self.backend.frontend_queue = frontend_queue
         self.backend.backend_queue = backend_queue
@@ -99,7 +95,6 @@ class SLAM:
         self.backend.set_hyperparams()
 
         self.params_gui = gui_utils.ParamsGUI(
-            pipe=self.pipeline_params,
             background=self.background,
             gaussians=self.gaussians,
             q_main2vis=q_main2vis,
@@ -142,7 +137,6 @@ class SLAM:
             self.gaussians,
             self.dataset,
             self.save_dir,
-            self.pipeline_params,
             self.background,
             kf_indices=kf_indices,
             final=False,
@@ -186,7 +180,6 @@ class SLAM:
                                               self.gaussians,
                                               self.dataset,
                                               self.save_dir,
-                                              self.pipeline_params,
                                               self.background,
                                               kf_indices=kf_indices,
                                               final=True)

@@ -45,7 +45,6 @@ class SLAM_GUI:
 
         self.q_main2vis = None
         self.gaussian_cur = None
-        self.pipe = None
         self.background = None
 
         self.init = False
@@ -58,7 +57,6 @@ class SLAM_GUI:
             self.init = True
             self.q_main2vis = params_gui.q_main2vis
             self.q_vis2main = params_gui.q_vis2main
-            self.pipe = params_gui.pipe
 
         self.gaussian_nums = []
 
@@ -442,7 +440,6 @@ class SLAM_GUI:
 
         if gaussian_packet.finish:
             Log("Received terminate signal", tag="GUI")
-            # clean up the pipe
             while not self.q_main2vis.empty():
                 self.q_main2vis.get()
             while not self.q_vis2main.empty():
