@@ -6,6 +6,7 @@ from utils.slam_utils import image_gradient, image_gradient_mask
 
 
 class Camera(nn.Module):
+
     def __init__(
         self,
         uid,
@@ -47,18 +48,14 @@ class Camera(nn.Module):
         self.image_width = image_width
 
         self.cam_rot_delta = nn.Parameter(
-            torch.zeros(3, requires_grad=True, device=device)
-        )
+            torch.zeros(3, requires_grad=True, device=device))
         self.cam_trans_delta = nn.Parameter(
-            torch.zeros(3, requires_grad=True, device=device)
-        )
+            torch.zeros(3, requires_grad=True, device=device))
 
         self.exposure_a = nn.Parameter(
-            torch.tensor([0.0], requires_grad=True, device=device)
-        )
+            torch.tensor([0.0], requires_grad=True, device=device))
         self.exposure_b = nn.Parameter(
-            torch.tensor([0.0], requires_grad=True, device=device)
-        )
+            torch.tensor([0.0], requires_grad=True, device=device))
 
         self.projection_matrix = projection_matrix.to(device=device)
 
@@ -84,12 +81,16 @@ class Camera(nn.Module):
 
     @staticmethod
     def init_from_gui(uid, T, FoVx, FoVy, fx, fy, cx, cy, H, W):
-        projection_matrix = getProjectionMatrix2(
-            znear=0.01, zfar=100.0, fx=fx, fy=fy, cx=cx, cy=cy, W=W, H=H
-        ).transpose(0, 1)
-        return Camera(
-            uid, None, None, T, projection_matrix, fx, fy, cx, cy, FoVx, FoVy, H, W
-        )
+        projection_matrix = getProjectionMatrix2(znear=0.01,
+                                                 zfar=100.0,
+                                                 fx=fx,
+                                                 fy=fy,
+                                                 cx=cx,
+                                                 cy=cy,
+                                                 W=W,
+                                                 H=H).transpose(0, 1)
+        return Camera(uid, None, None, T, projection_matrix, fx, fy, cx, cy,
+                      FoVx, FoVy, H, W)
 
     @property
     def world_view_transform(self):
@@ -97,11 +98,8 @@ class Camera(nn.Module):
 
     @property
     def full_proj_transform(self):
-        return (
-            self.world_view_transform.unsqueeze(0).bmm(
-                self.projection_matrix.unsqueeze(0)
-            )
-        ).squeeze(0)
+        return (self.world_view_transform.unsqueeze(0).bmm(
+            self.projection_matrix.unsqueeze(0))).squeeze(0)
 
     @property
     def camera_center(self):
@@ -129,8 +127,8 @@ class Camera(nn.Module):
                 for c in range(col):
                     block = img_grad_intensity[
                         :,
-                        r * int(h / row) : (r + 1) * int(h / row),
-                        c * int(w / col) : (c + 1) * int(w / col),
+                        r * int(h / row):(r + 1) * int(h / row),
+                        c * int(w / col):(c + 1) * int(w / col),
                     ]
                     th_median = block.median()
                     block[block > (th_median * multiplier)] = 1
@@ -138,9 +136,8 @@ class Camera(nn.Module):
             self.grad_mask = img_grad_intensity
         else:
             median_img_grad_intensity = img_grad_intensity.median()
-            self.grad_mask = (
-                img_grad_intensity > median_img_grad_intensity * edge_threshold
-            )
+            self.grad_mask = (img_grad_intensity
+                              > median_img_grad_intensity * edge_threshold)
 
     def clean(self):
         self.original_image = None

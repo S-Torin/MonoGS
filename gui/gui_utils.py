@@ -14,7 +14,12 @@ cv_gl = np.array([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
 
 
 class Frustum:
-    def __init__(self, line_set, view_dir=None, view_dir_behind=None, size=None):
+
+    def __init__(self,
+                 line_set,
+                 view_dir=None,
+                 view_dir_behind=None,
+                 size=None):
         self.line_set = line_set
         self.view_dir = view_dir
         self.view_dir_behind = view_dir_behind
@@ -32,7 +37,8 @@ class Frustum:
         eye = cameraeye[0, :]
 
         base_behind = np.array([[0.0, -2.5, -30.0]]) * self.size
-        base_behind_hmg = np.hstack([base_behind, np.ones((base_behind.shape[0], 1))])
+        base_behind_hmg = np.hstack(
+            [base_behind, np.ones((base_behind.shape[0], 1))])
         cameraeye_behind = pose @ base_behind_hmg.transpose()
         cameraeye_behind = cameraeye_behind[0:3, :].transpose()
         eye_behind = cameraeye_behind[0, :]
@@ -49,18 +55,13 @@ class Frustum:
 
 
 def create_frustum(pose, frusutum_color=[0, 1, 0], size=0.02):
-    points = (
-        np.array(
-            [
-                [0.0, 0.0, 0],
-                [1.0, -0.5, 2],
-                [-1.0, -0.5, 2],
-                [1.0, 0.5, 2],
-                [-1.0, 0.5, 2],
-            ]
-        )
-        * size
-    )
+    points = (np.array([
+        [0.0, 0.0, 0],
+        [1.0, -0.5, 2],
+        [-1.0, -0.5, 2],
+        [1.0, 0.5, 2],
+        [-1.0, 0.5, 2],
+    ]) * size)
 
     lines = [[0, 1], [0, 2], [0, 3], [0, 4], [1, 2], [1, 3], [2, 4], [3, 4]]
     colors = [frusutum_color for i in range(len(lines))]
@@ -75,6 +76,7 @@ def create_frustum(pose, frusutum_color=[0, 1, 0], size=0.02):
 
 
 class GaussianPacket:
+
     def __init__(
         self,
         gaussians=None,
@@ -122,19 +124,18 @@ class GaussianPacket:
             return cv2.resize(img, (width, height))
         height = int(width * img.shape[1] / img.shape[2])
         # img is 3xHxW
-        img = torch.nn.functional.interpolate(
-            img.unsqueeze(0), size=(height, width), mode="bilinear", align_corners=False
-        )
+        img = torch.nn.functional.interpolate(img.unsqueeze(0),
+                                              size=(height, width),
+                                              mode="bilinear",
+                                              align_corners=False)
         return img.squeeze(0)
 
     def get_covariance(self, scaling_modifier=1):
         return self.build_covariance_from_scaling_rotation(
-            self.get_scaling, scaling_modifier, self._rotation
-        )
+            self.get_scaling, scaling_modifier, self._rotation)
 
-    def build_covariance_from_scaling_rotation(
-        self, scaling, scaling_modifier, rotation
-    ):
+    def build_covariance_from_scaling_rotation(self, scaling, scaling_modifier,
+                                               rotation):
         L = build_scaling_rotation(scaling_modifier * scaling, rotation)
         actual_covariance = L @ L.transpose(1, 2)
         symm = strip_symmetric(actual_covariance)
@@ -160,6 +161,7 @@ class Packet_vis2main:
 
 
 class ParamsGUI:
+
     def __init__(
         self,
         pipe=None,

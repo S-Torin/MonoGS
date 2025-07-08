@@ -3,9 +3,7 @@ Results:
   save_results: True
   save_dir: "results"
   save_trj: True
-  save_trj_kf_intv: 5
   use_gui: True
-  eval_all: False
   use_wandb: False
 
 Dataset:
@@ -13,7 +11,7 @@ Dataset:
   sensor_type: 'depth'
   pcd_downsample: 128
   pcd_downsample_init: 32
-  adaptive_pointsize: True
+  adaptive_pointsize: False
   point_size: 0.01
 
 Training:
@@ -24,6 +22,7 @@ Training:
   init_gaussian_th: 0.005
   init_gaussian_extent: 30
   # Tracking and Mapping
+  use_gt_pose: False
   tracking_itr_num: 100
   mapping_itr_num: 150
   gaussian_update_every: 150
@@ -72,7 +71,7 @@ opt_params:
   densify_grad_threshold: 0.0002
 
 model_params:
-  sh_degree: 0
+  sh_degree: 2
   source_path: ""
   model_path: ""
   resolution: -1

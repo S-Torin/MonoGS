@@ -12,6 +12,7 @@ from evo.tools import plot
 from evo.tools.plot import PlotMode
 from evo.tools.settings import SETTINGS
 import matplotlib
+
 matplotlib.use("Agg")  # Use a non-interactive backend for matplotlib
 from matplotlib import pyplot as plt
 from torchmetrics.image.lpip import LearnedPerceptualImagePatchSimilarity
@@ -28,9 +29,9 @@ from utils.logging_utils import Log
 def evaluate_evo(poses_gt, poses_est, result_dir, label, monocular=False):
     traj_ref = PosePath3D(poses_se3=poses_gt)
     traj_est = PosePath3D(poses_se3=poses_est)
-    traj_est_aligned = trajectory.align_trajectory(
-        traj_est, traj_ref, correct_scale=monocular
-    )
+    traj_est_aligned = trajectory.align_trajectory(traj_est,
+                                                   traj_ref,
+                                                   correct_scale=monocular)
 
     pose_relation = metrics.PoseRelation.translation_part
     data = (traj_ref, traj_est_aligned)
@@ -41,9 +42,9 @@ def evaluate_evo(poses_gt, poses_est, result_dir, label, monocular=False):
     Log("RMSE ATE \[m]", ape_stat, tag="Eval")
 
     with open(
-        os.path.join(result_dir, "stats_{}.json".format(str(label))),
-        "w",
-        encoding="utf-8",
+            os.path.join(result_dir, "stats_{}.json".format(str(label))),
+            "w",
+            encoding="utf-8",
     ) as f:
         json.dump(ape_stats, f, indent=4)
 
@@ -61,7 +62,8 @@ def evaluate_evo(poses_gt, poses_est, result_dir, label, monocular=False):
         max_map=ape_stats["max"],
     )
     ax.legend()
-    plt.savefig(os.path.join(result_dir, "traj_{}.png".format(str(label))), dpi=90)
+    plt.savefig(os.path.join(result_dir, "traj_{}.png".format(str(label))),
+                dpi=90)
 
     return ape_stat
 
@@ -123,19 +125,22 @@ def eval_ate(frames, kf_ids, save_dir, final=False, monocular=False):
     with open(os.path.join(result_dir, f"ate_results.json"), "w") as f:
         json.dump(ate_results, f, indent=4)
 
-    wandb.log({"frame_idx": latest_frame_idx, "ate_all": ate_all, "ate_keyframes": ate_kf})
+    wandb.log({
+        "frame_idx": latest_frame_idx,
+        "ate_all": ate_all,
+        "ate_keyframes": ate_kf
+    })
     return ate_all, ate_kf
 
 
-def eval_rendering(
-    frames,
-    gaussians,
-    dataset,
-    save_dir,
-    pipe,
-    background,
-    kf_indices,
-    final=False):
+def eval_rendering(frames,
+                   gaussians,
+                   dataset,
+                   save_dir,
+                   pipe,
+                   background,
+                   kf_indices,
+                   final=False):
     interval = 1
     end_idx = len(frames) - 1
     eval_type = "after_opt" if final else "before_opt"
@@ -143,8 +148,7 @@ def eval_rendering(
     train_psnr_array, train_ssim_array, train_lpips_array = [], [], []
     val_psnr_array, val_ssim_array, val_lpips_array = [], [], []
     cal_lpips = LearnedPerceptualImagePatchSimilarity(
-        net_type="alex", normalize=True
-    ).to("cuda")
+        net_type="alex", normalize=True).to("cuda")
     render_save_dir = os.path.join(save_dir, eval_type, "render")
     mkdir_p(render_save_dir)
     image_save_dir = os.path.join(save_dir, eval_type, "render/images")
@@ -163,10 +167,10 @@ def eval_rendering(
         rendering = render(frame, gaussians, pipe, background)["render"]
         image = torch.clamp(rendering, 0.0, 1.0)
 
-        gt = (gt_image.cpu().numpy().transpose((1, 2, 0)) * 255).astype(np.uint8)
-        pred = (image.detach().cpu().numpy().transpose((1, 2, 0)) * 255).astype(
-            np.uint8
-        )
+        gt = (gt_image.cpu().numpy().transpose(
+            (1, 2, 0)) * 255).astype(np.uint8)
+        pred = (image.detach().cpu().numpy().transpose(
+            (1, 2, 0)) * 255).astype(np.uint8)
         gt = cv2.cvtColor(gt, cv2.COLOR_BGR2RGB)
         pred = cv2.cvtColor(pred, cv2.COLOR_BGR2RGB)
 
@@ -180,7 +184,8 @@ def eval_rendering(
 
         mask = gt_image > 0
 
-        psnr_score = psnr((image[mask]).unsqueeze(0), (gt_image[mask]).unsqueeze(0))
+        psnr_score = psnr((image[mask]).unsqueeze(0),
+                          (gt_image[mask]).unsqueeze(0))
         ssim_score = ssim((image).unsqueeze(0), (gt_image).unsqueeze(0))
         lpips_score = cal_lpips((image).unsqueeze(0), (gt_image).unsqueeze(0))
 
@@ -216,16 +221,22 @@ def eval_rendering(
     output["total_frames"] = len(frame_results)
 
     train_output = dict()
-    train_output["mean_psnr"] = float(np.mean(train_psnr_array)) if train_psnr_array else 0.0
-    train_output["mean_ssim"] = float(np.mean(train_ssim_array)) if train_ssim_array else 0.0
-    train_output["mean_lpips"] = float(np.mean(train_lpips_array)) if train_lpips_array else 0.0
+    train_output["mean_psnr"] = float(
+        np.mean(train_psnr_array)) if train_psnr_array else 0.0
+    train_output["mean_ssim"] = float(
+        np.mean(train_ssim_array)) if train_ssim_array else 0.0
+    train_output["mean_lpips"] = float(
+        np.mean(train_lpips_array)) if train_lpips_array else 0.0
     train_output["frame_results"] = train_frame_results
     train_output["total_frames"] = len(train_frame_results)
 
     val_output = dict()
-    val_output["mean_psnr"] = float(np.mean(val_psnr_array)) if val_psnr_array else 0.0
-    val_output["mean_ssim"] = float(np.mean(val_ssim_array)) if val_ssim_array else 0.0
-    val_output["mean_lpips"] = float(np.mean(val_lpips_array)) if val_lpips_array else 0.0
+    val_output["mean_psnr"] = float(
+        np.mean(val_psnr_array)) if val_psnr_array else 0.0
+    val_output["mean_ssim"] = float(
+        np.mean(val_ssim_array)) if val_ssim_array else 0.0
+    val_output["mean_lpips"] = float(
+        np.mean(val_lpips_array)) if val_lpips_array else 0.0
     val_output["frame_results"] = val_frame_results
     val_output["total_frames"] = len(val_frame_results)
 
@@ -239,23 +250,30 @@ def eval_rendering(
 
     json.dump(
         output,
-        open(os.path.join(psnr_save_dir, "final_result.json"), "w", encoding="utf-8"),
+        open(os.path.join(psnr_save_dir, "final_result.json"),
+             "w",
+             encoding="utf-8"),
         indent=4,
     )
 
     json.dump(
         train_output,
-        open(os.path.join(psnr_save_dir, "train_result.json"), "w", encoding="utf-8"),
+        open(os.path.join(psnr_save_dir, "train_result.json"),
+             "w",
+             encoding="utf-8"),
         indent=4,
     )
 
     json.dump(
         val_output,
-        open(os.path.join(psnr_save_dir, "val_result.json"), "w", encoding="utf-8"),
+        open(os.path.join(psnr_save_dir, "val_result.json"),
+             "w",
+             encoding="utf-8"),
         indent=4,
     )
 
     return output
+
 
 def save_gaussians(gaussians, name, final=False):
     if name is None:

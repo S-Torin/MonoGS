@@ -40,12 +40,9 @@ def render(
     if pc.get_xyz.shape[0] == 0:
         return None
 
-    screenspace_points = (
-        torch.zeros_like(
-            pc.get_xyz, dtype=pc.get_xyz.dtype, requires_grad=True, device="cuda"
-        )
-        + 0
-    )
+    screenspace_points = (torch.zeros_like(
+        pc.get_xyz, dtype=pc.get_xyz.dtype, requires_grad=True, device="cuda")
+                          + 0)
     try:
         screenspace_points.retain_grad()
     except Exception:
@@ -99,11 +96,9 @@ def render(
     if colors_precomp is None:
         if pipe.convert_SHs_python:
             shs_view = pc.get_features.transpose(1, 2).view(
-                -1, 3, (pc.max_sh_degree + 1) ** 2
-            )
+                -1, 3, (pc.max_sh_degree + 1)**2)
             dir_pp = pc.get_xyz - viewpoint_camera.camera_center.repeat(
-                pc.get_features.shape[0], 1
-            )
+                pc.get_features.shape[0], 1)
             dir_pp_normalized = dir_pp / dir_pp.norm(dim=1, keepdim=True)
             sh2rgb = eval_sh(pc.active_sh_degree, shs_view, dir_pp_normalized)
             colors_precomp = torch.clamp_min(sh2rgb + 0.5, 0.0)
@@ -118,11 +113,13 @@ def render(
             means3D=means3D[mask],
             means2D=means2D[mask],
             shs=shs[mask],
-            colors_precomp=colors_precomp[mask] if colors_precomp is not None else None,
+            colors_precomp=colors_precomp[mask]
+            if colors_precomp is not None else None,
             opacities=opacity[mask],
             scales=scales[mask],
             rotations=rotations[mask],
-            cov3D_precomp=cov3D_precomp[mask] if cov3D_precomp is not None else None,
+            cov3D_precomp=cov3D_precomp[mask]
+            if cov3D_precomp is not None else None,
             theta=viewpoint_camera.cam_rot_delta,
             rho=viewpoint_camera.cam_trans_delta,
         )
