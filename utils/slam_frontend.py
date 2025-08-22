@@ -205,6 +205,7 @@ class FrontEnd(mp.Process):
         dist = torch.norm((pose_CW @ last_kf_WC)[0:3, 3])
         dist_check = dist > kf_translation * self.median_depth
         dist_check2 = dist > kf_min_translation * self.median_depth
+        interval_check = curr_frame.uid - last_kf.uid > self.config["Training"]["max_interval"]
 
         union = torch.logical_or(
             cur_frame_visibility_filter,
@@ -213,7 +214,7 @@ class FrontEnd(mp.Process):
             cur_frame_visibility_filter,
             occ_aware_visibility[last_keyframe_idx]).count_nonzero()
         point_ratio_2 = intersection / union
-        return (point_ratio_2 < kf_overlap and dist_check2) or dist_check
+        return (point_ratio_2 < kf_overlap and dist_check2) or dist_check or interval_check
 
     def add_to_window(self, cur_frame_idx, cur_frame_visibility_filter,
                       occ_aware_visibility, window):
@@ -411,8 +412,10 @@ class FrontEnd(mp.Process):
                         self.occ_aware_visibility[last_keyframe_idx]
                     ).count_nonzero()
                     point_ratio = intersection / union
-                    create_kf = (check_time and point_ratio
-                                 < self.config["Training"]["kf_overlap"])
+                    point_ratio_check = point_ratio < self.config["Training"]["kf_overlap"]
+                    interval_check = cur_frame_idx - last_keyframe_idx > self.config["Training"]["max_interval"]
+                    create_kf = check_time and (point_ratio_check or interval_check)
+
                 if self.single_thread:
                     create_kf = check_time and create_kf
                 if create_kf:
