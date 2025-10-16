@@ -279,14 +279,10 @@ def save_gaussians(gaussians, name, final=False):
         return
     if final:
         point_cloud_path = os.path.join(name, "after_opt/point_cloud")
-        semantic_cloud_path = os.path.join(name, "after_opt/semantic_cloud")
     else:
         point_cloud_path = os.path.join(name, "before_opt/point_cloud")
-        semantic_cloud_path = os.path.join(name, "before_opt/semantic_cloud")
     mkdir_p(point_cloud_path)
-    mkdir_p(semantic_cloud_path)
     save_path = os.path.join(point_cloud_path, "point_cloud.ply")
-    semantic_save_path = os.path.join(semantic_cloud_path, "semantic_cloud.ply")
 
     print(f"Saving Gaussian point cloud...")
     gaussians.save_ply(save_path)

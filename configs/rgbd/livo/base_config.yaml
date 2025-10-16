@@ -24,15 +24,16 @@ Training:
   # Tracking and Mapping
   use_gt_pose: True
   tracking_itr_num: 100
-  mapping_itr_num: 150
+  mapping_itr_num: 10
   gaussian_update_every: 150
   gaussian_update_offset: 50
   gaussian_th: 0.7
   gaussian_extent: 1.0
   gaussian_reset: 2001
   size_threshold: 20
+  max_interval: 5
   kf_interval: 5
-  window_size: 8
+  window_size: 5
   pose_window: 3
   edge_threshold: 1.1
   rgb_boundary_threshold: 0.01
@@ -46,7 +47,7 @@ Training:
   lr:
     cam_rot_delta: 0.003
     cam_trans_delta: 0.001
-  post_training: True
+  post_training: False
   post_training_iters: 30000
 
 ## 3DGS default parameters
