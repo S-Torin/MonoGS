@@ -88,11 +88,10 @@ class BackEnd(mp.Process):
         self.initialized = not self.monocular
         self.keyframe_optimizers = None
 
-        # remove all gaussians
         self.gaussians.prune_points(self.gaussians.unique_kfIDs >= 0)
-        # remove everything from the queues
-        while not self.backend_queue.empty():
-            self.backend_queue.get()
+        if self.backend_queue is not None:
+            while not self.backend_queue.empty():
+                self.backend_queue.get()
 
     def initialize_map(self, cur_frame_idx, viewpoint):
         for mapping_iteration in range(self.init_itr_num):
@@ -376,7 +375,8 @@ class BackEnd(mp.Process):
             tag,
             clone_obj(self.gaussians), self.occ_aware_visibility, keyframes
         ]
-        self.frontend_queue.put(msg)
+        if self.frontend_queue is not None:
+            self.frontend_queue.put(msg)
 
     def run(self):
         while True:
@@ -489,8 +489,10 @@ class BackEnd(mp.Process):
                     self.push_to_frontend("keyframe")
                 else:
                     raise Exception("Unprocessed data", data)
-        while not self.backend_queue.empty():
-            self.backend_queue.get()
-        while not self.frontend_queue.empty():
-            self.frontend_queue.get()
+        if self.backend_queue is not None:
+            while not self.backend_queue.empty():
+                self.backend_queue.get()
+        if self.frontend_queue is not None:
+            while not self.frontend_queue.empty():
+                self.frontend_queue.get()
         return

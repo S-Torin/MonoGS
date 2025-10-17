@@ -18,7 +18,6 @@ from matplotlib import pyplot as plt
 from torchmetrics.image.lpip import LearnedPerceptualImagePatchSimilarity
 from tqdm import tqdm
 
-import wandb
 from gaussian_splatting.gaussian_renderer import render
 from gaussian_splatting.utils.image_utils import psnr
 from gaussian_splatting.utils.loss_utils import ssim
@@ -151,7 +150,6 @@ def eval_ate(frames, kf_ids, save_dir, final=False, monocular=False):
     with open(os.path.join(result_dir, f"ate_results.json"), "w") as f:
         json.dump(ate_results, f, indent=4)
 
-    wandb.log({"frame_idx": latest_frame_idx, "ate_all": ate_all, "ate_keyframes": ate_kf, "rpe_all": rpe_all, "rpe_keyframes": rpe_kf})
     return
 
 

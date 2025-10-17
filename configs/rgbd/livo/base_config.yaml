@@ -3,14 +3,13 @@ Results:
   save_results: True
   save_dir: "results"
   save_trj: True
-  use_gui: True
-  use_wandb: False
+  use_gui: False
 
 Dataset:
   type: 'tum'
   sensor_type: 'depth'
-  pcd_downsample: 128
-  pcd_downsample_init: 32
+  pcd_downsample: 4
+  pcd_downsample_init: 2
   adaptive_pointsize: False
   point_size: 0.01
 
@@ -43,7 +42,7 @@ Training:
   kf_overlap: 0.9
   kf_cutoff: 0.3
   prune_mode: 'slam'
-  single_thread: False
+  single_thread: True
   lr:
     cam_rot_delta: 0.003
     cam_trans_delta: 0.001

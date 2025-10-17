@@ -29,7 +29,6 @@ dependencies:
     - PyOpenGL
     - glfw
     - PyGLM
-    - wandb
     - lpips
     - rich
     - ruff

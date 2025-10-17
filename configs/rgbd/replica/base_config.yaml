@@ -4,7 +4,6 @@ Results:
   save_trj: True
   save_trj_kf_intv: 20
   use_gui: True
-  use_wandb: False
 
 Dataset:
   sensor_type: 'depth'

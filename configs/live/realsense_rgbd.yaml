@@ -4,7 +4,6 @@ Results:
   save_trj: False
   save_trj_kf_intv: 0
   use_gui: True
-  use_wandb: False
 
 Dataset:
   dataset_path: datasets/realsense/rgbd

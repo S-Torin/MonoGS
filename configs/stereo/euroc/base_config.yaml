@@ -5,7 +5,6 @@ Results:
   save_trj: False
   save_trj_kf_intv: 5
   use_gui: True
-  use_wandb: False
 
 Dataset:
   type: 'euroc'
